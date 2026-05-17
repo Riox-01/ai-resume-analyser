@@ -32,4 +32,3 @@ const ResumeCard: ({ resume }: { resume: Resume }) => Element = ({ resume: { id 
 }
 
 export default ResumeCard
-
