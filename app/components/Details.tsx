@@ -65,6 +65,7 @@ const CategoryContent = ({
     explanation?: string;
   }[];
 }) => {
+
   if (!tips || tips.length === 0) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-2xl p-4">
@@ -73,14 +74,32 @@ const CategoryContent = ({
     );
   }
 
+  const uniqueTips = tips.filter(
+    (tip, index, self) =>
+      index ===
+      self.findIndex(
+        (t) =>
+          t.tip?.trim().toLowerCase() ===
+          tip.tip?.trim().toLowerCase()
+      )
+  );
+
+  const summaryTips = uniqueTips.slice(0, 2);
+
+  const detailedTips = uniqueTips.slice(2);
+
   return (
     <div className="flex flex-col gap-4 items-center w-full">
+
       <div className="bg-gray-50 w-full rounded-lg px-5 py-4 grid grid-cols-2 gap-4">
-        {tips.map((tip, index) => (
+
+        {summaryTips.map((tip, index) => (
+
           <div
             className="flex flex-row gap-2 items-center"
             key={`summary-${index}`}
           >
+
             <img
               src={
                 tip?.type === "good"
@@ -94,12 +113,16 @@ const CategoryContent = ({
             <p className="text-xl text-gray-500">
               {tip?.tip || "No tip provided"}
             </p>
+
           </div>
         ))}
+
       </div>
 
       <div className="flex flex-col gap-4 w-full">
-        {tips.map((tip, index) => (
+
+        {detailedTips.map((tip, index) => (
+
           <div
             key={`detail-${index}`}
             className={cn(
@@ -109,7 +132,9 @@ const CategoryContent = ({
                 : "bg-yellow-50 border border-yellow-200 text-yellow-700"
             )}
           >
+
             <div className="flex flex-row gap-2 items-center">
+
               <img
                 src={
                   tip?.type === "good"
@@ -123,12 +148,18 @@ const CategoryContent = ({
               <p className="text-xl font-semibold">
                 {tip?.tip || "No title"}
               </p>
+
             </div>
 
-            <p>{tip?.explanation || "No explanation available"}</p>
+            <p>
+              {tip?.explanation || "No explanation available"}
+            </p>
+
           </div>
         ))}
+
       </div>
+
     </div>
   );
 };

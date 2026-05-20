@@ -8,12 +8,15 @@ import { generateUUID } from "~/lib/utils";
 import { prepareInstructions } from "~/consatnts";
 
 const Upload = () => {
-  const { auth, isLoading, fs, ai, kv } = usePuterStore();
+
+  const { fs, ai, kv } = usePuterStore();
 
   const navigate = useNavigate();
 
   const [isProcessing, setIsProcessing] = useState(false);
+
   const [statusText, setStatusText] = useState("");
+
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileSelect = (file: File | null) => {
@@ -31,43 +34,66 @@ const Upload = () => {
     jobDescription: string;
     file: File;
   }) => {
+
     try {
+
       setIsProcessing(true);
 
-      // Upload PDF
-      setStatusText("Uploading the file...");
+      // =========================
+      // Upload Resume
+      // =========================
+
+      setStatusText("Uploading resume...");
 
       const uploadedFile = await fs.upload([file]);
 
       if (!uploadedFile) {
-        setStatusText("Error: Failed to upload file");
+
+        setStatusText("Failed to upload resume");
+
         return;
       }
 
-      // Convert PDF to image
-      setStatusText("Converting PDF to image...");
+      // =========================
+      // Convert PDF To Image
+      // =========================
+
+      setStatusText("Generating resume preview...");
 
       const imageFile = await convertPdfToImage(file);
 
       if (!imageFile.file) {
-        setStatusText("Error: Failed to convert PDF");
+
+        setStatusText("Failed to generate preview");
+
         return;
       }
 
-      // Upload image
-      setStatusText("Uploading image...");
+      // =========================
+      // Upload Preview Image
+      // =========================
+
+      setStatusText("Uploading preview image...");
 
       const uploadedImage = await fs.upload([imageFile.file]);
 
       if (!uploadedImage) {
-        setStatusText("Error: Failed to upload image");
+
+        setStatusText("Failed to upload image");
+
         return;
       }
 
-      // Generate unique ID
+      // =========================
+      // Generate ID
+      // =========================
+
       const uuid = generateUUID();
 
-      // Initial data
+      // =========================
+      // Initial Resume Data
+      // =========================
+
       const data = {
         id: uuid,
         resumePath: uploadedFile.path,
@@ -78,74 +104,86 @@ const Upload = () => {
         feedback: null,
       };
 
-      // Save initial state
-      await kv.set(`resume:${uuid}`, JSON.stringify(data));
+      // =========================
+      // Save Initial Data
+      // =========================
 
+      await kv.set(
+        `resume:${uuid}`,
+        JSON.stringify(data)
+      );
+
+      // =========================
       // AI Analysis
+      // =========================
+
       setStatusText("Analyzing resume with AI...");
 
       const feedback = await ai.feedback(
+
         uploadedFile.path,
 
         prepareInstructions({
+
           jobTitle: String(jobTitle),
+
           jobDescription: String(jobDescription),
 
           AIResponseFormat: `
 {
-  "summary": "string",
+  "overallScore": 75,
 
   "ATS": {
-    "score": 85,
+    "score": 70,
     "tips": [
       {
-        "type": "good",
-        "tip": "string",
-        "explanation": "string"
+        "type": "improve",
+        "tip": "Missing measurable achievements",
+        "explanation": "Projects and experience lack quantified impact and engineering metrics."
       }
     ]
   },
 
   "toneAndStyle": {
-    "score": 80,
+    "score": 65,
     "tips": [
       {
-        "type": "good",
-        "tip": "string",
-        "explanation": "string"
+        "type": "improve",
+        "tip": "Weak action verbs",
+        "explanation": "Bullet points use passive and generic wording instead of impactful engineering language."
       }
     ]
   },
 
   "content": {
-    "score": 78,
+    "score": 60,
     "tips": [
       {
-        "type": "good",
-        "tip": "string",
-        "explanation": "string"
+        "type": "improve",
+        "tip": "Projects lack technical depth",
+        "explanation": "Projects appear surface-level and do not demonstrate advanced engineering complexity."
       }
     ]
   },
 
   "structure": {
-    "score": 82,
+    "score": 72,
     "tips": [
       {
         "type": "good",
-        "tip": "string",
-        "explanation": "string"
+        "tip": "Readable layout",
+        "explanation": "Resume sections are organized clearly and easy to scan."
       }
     ]
   },
 
   "skills": {
-    "score": 75,
+    "score": 68,
     "tips": [
       {
-        "type": "good",
-        "tip": "string",
-        "explanation": "string"
+        "type": "improve",
+        "tip": "Skill section too generic",
+        "explanation": "Skills lack specialization and modern industry-relevant tooling."
       }
     ]
   }
@@ -157,11 +195,16 @@ const Upload = () => {
       console.log("FULL AI OBJECT:", feedback);
 
       if (!feedback) {
-        setStatusText("Error: AI analysis failed");
+
+        setStatusText("AI analysis failed");
+
         return;
       }
 
-      // Extract AI response safely
+      // =========================
+      // Extract AI Response
+      // =========================
+
       const feedbackText =
         typeof feedback === "string"
           ? feedback
@@ -171,57 +214,110 @@ const Upload = () => {
 
       console.log("RAW AI RESPONSE:", feedbackText);
 
-      // Parse JSON safely
+      // =========================
+      // Parse JSON
+      // =========================
+
       let parsedFeedback;
 
       try {
+
         parsedFeedback = JSON.parse(feedbackText);
+
       } catch (error) {
+
         console.error("JSON Parse Error:", error);
-        setStatusText("Error: Invalid AI response");
+
+        setStatusText("Invalid AI response");
+
         return;
       }
 
       console.log("PARSED FEEDBACK:", parsedFeedback);
 
-      // Save parsed feedback
+      // =========================
+      // Validate Response
+      // =========================
+
+      if (
+        !parsedFeedback ||
+        !parsedFeedback.overallScore ||
+        !parsedFeedback.ATS ||
+        !parsedFeedback.toneAndStyle ||
+        !parsedFeedback.content ||
+        !parsedFeedback.structure ||
+        !parsedFeedback.skills
+      ) {
+
+        setStatusText("Incomplete AI response");
+
+        return;
+      }
+
+      // =========================
+      // Save Feedback
+      // =========================
+
       data.feedback = parsedFeedback;
 
-      await kv.set(`resume:${uuid}`, JSON.stringify(data));
+      await kv.set(
+        `resume:${uuid}`,
+        JSON.stringify(data)
+      );
 
       console.log("FINAL SAVED DATA:", data);
 
-      setStatusText("Analysis complete! Redirecting...");
+      setStatusText("Analysis complete!");
 
-      // Navigate to review page
-      navigate(`/resume/${uuid}`);
+      // =========================
+      // Redirect
+      // =========================
+
+      setTimeout(() => {
+
+        navigate(`/resume/${uuid}`);
+
+      }, 1000);
+
     } catch (error) {
+
       console.error(error);
+
       setStatusText("Something went wrong");
+
     } finally {
+
       setIsProcessing(false);
+
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    e: FormEvent<HTMLFormElement>
+  ) => {
+
     e.preventDefault();
 
-    const form = e.currentTarget.closest("form");
+    const form =
+      e.currentTarget.closest("form");
 
     if (!form) return;
 
     const formData = new FormData(form);
 
-    const companyName = formData.get("company-name") as string;
+    const companyName =
+      formData.get("company-name") as string;
 
-    const jobTitle = formData.get("job-title") as string;
+    const jobTitle =
+      formData.get("job-title") as string;
 
-    const jobDescription = formData.get(
-      "job-description"
-    ) as string;
+    const jobDescription =
+      formData.get("job-description") as string;
 
     if (!file) {
+
       alert("Please upload a resume");
+
       return;
     }
 
@@ -234,13 +330,18 @@ const Upload = () => {
   };
 
   return (
+
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
+
       <Navbar />
 
       <section className="main-section">
+
         <div className="page-heading py-16">
 
-          <h1>Smart feedback for your dream job</h1>
+          <h1>
+            Smart feedback for your dream job
+          </h1>
 
           {isProcessing ? (
             <>
@@ -254,11 +355,13 @@ const Upload = () => {
             </>
           ) : (
             <h2>
-              Drop your resume for an ATS score and improvement tips
+              Drop your resume for an ATS score
+              and improvement tips
             </h2>
           )}
 
           {!isProcessing && (
+
             <form
               id="upload-form"
               onSubmit={handleSubmit}
@@ -266,6 +369,7 @@ const Upload = () => {
             >
 
               <div className="form-div">
+
                 <label htmlFor="company-name">
                   Company Name
                 </label>
@@ -276,9 +380,11 @@ const Upload = () => {
                   placeholder="Company Name"
                   id="company-name"
                 />
+
               </div>
 
               <div className="form-div">
+
                 <label htmlFor="job-title">
                   Job Title
                 </label>
@@ -289,9 +395,11 @@ const Upload = () => {
                   placeholder="Job Title"
                   id="job-title"
                 />
+
               </div>
 
               <div className="form-div">
+
                 <label htmlFor="job-description">
                   Job Description
                 </label>
@@ -302,9 +410,11 @@ const Upload = () => {
                   placeholder="Job Description"
                   id="job-description"
                 />
+
               </div>
 
               <div className="form-div">
+
                 <label htmlFor="uploader">
                   Upload Resume
                 </label>
@@ -312,6 +422,7 @@ const Upload = () => {
                 <FileUploader
                   onFileSelect={handleFileSelect}
                 />
+
               </div>
 
               <button
@@ -325,7 +436,9 @@ const Upload = () => {
           )}
 
         </div>
+
       </section>
+
     </main>
   );
 };
