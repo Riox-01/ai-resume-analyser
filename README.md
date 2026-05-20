@@ -1,87 +1,164 @@
-# Welcome to React Router!
+# 🚀 AI Resume Analyzer
 
-A modern, production-ready template for building full-stack React applications using React Router.
+An AI-powered Resume Analyzer web application that helps users upload, analyze, and improve resumes using modern AI tools. The platform provides ATS-style feedback, resume scoring, skill analysis, and smart suggestions to help candidates build stronger resumes for tech and professional roles.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+---
 
-## Features
+## ✨ Features
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+* 📄 Upload Resume PDFs
+* 🖼 Convert Resume PDF to Preview Images
+* 🤖 AI-Powered Resume Analysis
+* 📊 ATS Compatibility Score
+* 🧠 Skill & Keyword Detection
+* 💼 Job Role Matching
+* ⚡ Fast and Responsive UI
+* 🔐 Secure File Handling
+* ☁️ Deployable on Vercel
 
-## Getting Started
+---
 
-### Installation
+## 🛠 Tech Stack
 
-Install the dependencies:
+### Frontend
+
+* React
+* TypeScript
+* Tailwind CSS
+* React Router
+
+### Backend / Services
+
+* Puter AI
+* PDF Processing Utilities
+
+### Deployment
+
+* Vercel
+
+---
+
+
+## 📂 Project Structure
+
+```bash
+├── app
+│   ├── components
+│   ├── routes
+│   ├── lib
+│   └── styles
+├── public
+├── functions
+├── package.json
+└── README.md
+```
+
+---
+
+## ⚙️ Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+```
+
+Go to the project directory:
+
+```bash
+cd your-repo-name
+```
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### Development
-
-Start the development server with HMR:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+---
 
-## Building for Production
+## 🔑 Environment Variables
 
-Create a production build:
+Create a `.env` file in the root directory and add:
 
-```bash
-npm run build
+```env
+VITE_PUTER_API_KEY=your_api_key
 ```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
 ---
 
-Built with ❤️ using React Router.
+## 🚀 Deployment on Vercel
+
+1. Push your project to GitHub
+2. Open [Vercel](https://vercel.com?utm_source=chatgpt.com)
+3. Import your GitHub repository
+4. Add environment variables
+5. Click Deploy
+
+---
+
+## 🧠 How It Works
+
+1. User uploads a resume PDF
+2. PDF gets converted into preview images
+3. AI analyzes resume content
+4. Resume receives ATS-style scoring
+5. Suggestions and improvements are generated instantly
+
+---
+
+## 🎯 Future Improvements
+
+* Multi-language Resume Support
+* Dark Mode
+* Resume Templates
+* AI Resume Builder
+* Interview Question Generator
+* Job Recommendation System
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch
+
+```bash
+git checkout -b feature-name
+```
+
+3. Commit changes
+
+```bash
+git commit -m "Added new feature"
+```
+
+4. Push to GitHub
+
+```bash
+git push origin feature-name
+```
+
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+Developed by **Rohan Singha Roy**
+
+If you like this project, give it a ⭐ on GitHub!
